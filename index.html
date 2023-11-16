@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathy(Beta)</title>
+    <style>
+    body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eaeaea;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 40px auto;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            font-size: 0.8em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mathy(Beta)</h1>
+        <div id="game-container">
+            <p>Enter your name:</p>
+            <input type="text" id="player-name">
+            <button onclick="startGame()">Start Game</button>
+        </div>
+        <div id="score-container"></div>
+        <div id="message-container"></div>
+        <footer>
+            <p>Complete 100 Levels to Win<p>
+            <p>Game created by Rifat Rupok</p>
+            <p><a href="mailto:r.islam@beyond-peace.org">Get in Touch</a></p>
+        </footer>
+    </div>
+<script>
+    let playerName = "";
+    let score = 0;
+    let timeLimit = 10; // Initial time limit
+    let level = 1;
+    let timer;
+    let startTime;
+
+    function startGame() {
+        playerName = document.getElementById("player-name").value;
+        if (playerName === "") {
+            alert("Please enter your name.");
+            return;
+        }
+        resetGame();
+        nextLevel();
+        startTime = new Date();
+    }
+
+    function resetGame() {
+        document.getElementById("game-container").innerHTML = "";
+        document.getElementById("score-container").innerHTML = "";
+        document.getElementById("message-container").innerHTML = "";
+        score = 0;
+        level = 1;
+        timeLimit = 10; // Reset time limit for new game
+    }
+
+    function nextLevel() {
+        if (level <= 100) {
+            const numbers = generateRandomNumbers(level + 1); // Start with 2 numbers at level 1
+            const correctSum = numbers.reduce((acc, num) => acc + num, 0);
+
+            document.getElementById("game-container").innerHTML = `
+                <p>Level ${level}: Add ${numbers.join(" + ")}</p>
+                <input type="number" id="player-answer">
+                <button onclick="checkAnswer(${correctSum})">Submit</button>
+                <p>Time left: <span id="time-left">${timeLimit}</span> seconds</p>
+            `;
+
+            document.getElementById("player-answer").focus();
+            startTimer();
+        } else {
+            endGame(true); // Player wins the game
+        }
+    }
+
+    function startTimer() {
+        clearInterval(timer); // Clear existing timer if any
+        timer = setInterval(function () {
+            timeLimit--;
+            document.getElementById("time-left").textContent = timeLimit;
+            if (timeLimit <= 0) {
+                clearInterval(timer);
+                endGame(false); // Time ran out
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(correctSum) {
+        const playerAnswer = parseInt(document.getElementById("player-answer").value);
+        if (playerAnswer === correctSum) {
+            score = level; // Increase score for each correct answer
+            level++;
+            timeLimit += 5; // Add 5 seconds for the next level
+            nextLevel();
+        } else {
+            document.getElementById("message-container").innerHTML = "<p style='color:red;'>Incorrect answer. Try again!</p>";
+        }
+    }
+
+    function endGame(playerWon) {
+        clearInterval(timer);
+        let endMessage = playerWon ? `Congratulations! You completed all 100 levels! ` : "Game Over!";
+        endMessage += ` Your final score: ${score}.`;
+
+        document.getElementById("game-container").innerHTML = `
+            <h3>${endMessage}</h3>
+            <button onclick="location.reload()">Play Again</button>
+        `;
+    }
+
+    function generateRandomNumbers(count) {
+        const numbers = [];
+        for (let i = 0; i < count; i++) {
+            numbers.push(Math.floor(Math.random() * 90) + 10);
+        }
+        return numbers;
+    }
+</script>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyBArgamlEvpeudCh6T-x7YjMIHJdM676TA",
+    authDomain: "mathy-7ae76.firebaseapp.com",
+    projectId: "mathy-7ae76",
+    storageBucket: "mathy-7ae76.appspot.com",
+    messagingSenderId: "535881764331",
+    appId: "1:535881764331:web:cb0d232921ea579f8f5dae",
+    measurementId: "G-KJJ6LF2QFW"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+</body>
+</html>
